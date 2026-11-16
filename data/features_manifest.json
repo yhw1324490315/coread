@@ -1,0 +1,151 @@
+{
+  "purpose": "Optional reference hashes and task metadata for previously frozen feature caches. Listed NPZ files are not tracked by Git; generate local features with the extract command.",
+  "reference_only": true,
+  "manifest_required_for_training": false,
+  "generation": "python run.py extract --data data/<dataset> --model models/pretrained/Qwen2.5-7B-Instruct",
+  "model": "Qwen2.5-7B-Instruct",
+  "representation": "post-normalization, answer-start prompt representation",
+  "source": "Previously frozen representations; copied without re-inference or dimensionality reduction.",
+  "datasets": {
+    "carbon_dot": {
+      "source_sha256": "d8e7b5788c0e727e35497813936341d7222591a4b2fdc8f29c7e9bd756172cc8",
+      "prompt_representations": 1252,
+      "dimension": 3584,
+      "dtype": "float32",
+      "bitwise_roundtrip": true,
+      "files": [
+        {
+          "path": "data/carbon_dot/features.npz",
+          "bytes": 8526872,
+          "sha256": "d8e7b5788c0e727e35497813936341d7222591a4b2fdc8f29c7e9bd756172cc8"
+        }
+      ]
+    },
+    "biochar": {
+      "source_sha256": "c719c548fb66cb22aaf753d1ad179e6f6c8943451801632cc737395c2f08e05f",
+      "prompt_representations": 886,
+      "dimension": 3584,
+      "dtype": "float32",
+      "bitwise_roundtrip": true,
+      "files": [
+        {
+          "path": "data/biochar/features.npz",
+          "bytes": 6043944,
+          "sha256": "c719c548fb66cb22aaf753d1ad179e6f6c8943451801632cc737395c2f08e05f"
+        }
+      ]
+    },
+    "perovskite": {
+      "source_sha256": "8cf8587a0d072b82020e6e23f659c02538b0523fb58d465593582ecd292b80f9",
+      "prompt_representations": 23231,
+      "dimension": 3584,
+      "dtype": "float32",
+      "bitwise_roundtrip": true,
+      "files": [
+        {
+          "path": "data/perovskite/features_000.npz",
+          "bytes": 40828005,
+          "sha256": "141bebe280e6f3a3d8f0b5910431c8c106469ffd0af770dfd3235da7111b2163"
+        },
+        {
+          "path": "data/perovskite/features_001.npz",
+          "bytes": 40829180,
+          "sha256": "eddde5b4404e61c01cb3dedf162e6a5093c2815d434de504e35508c3b4efc947"
+        },
+        {
+          "path": "data/perovskite/features_002.npz",
+          "bytes": 40827425,
+          "sha256": "b773b1dc77f2cb757e0e4b73285a8410e012b65da7c974b3489b4eb17dc5c8db"
+        },
+        {
+          "path": "data/perovskite/features_003.npz",
+          "bytes": 35596170,
+          "sha256": "dedb59403243465ec563642abb68290b9c555ebb09e93877c176f2ec4b211e9a"
+        }
+      ]
+    },
+    "ucnp_peaks": {
+      "source_sha256": "82e25cb5ab1d91d56d3332fde4a55b77e0be5b4216c370c8f234df6729b19363",
+      "prompt_representations": 7342,
+      "dimension": 3584,
+      "dtype": "float32",
+      "bitwise_roundtrip": true,
+      "files": [
+        {
+          "path": "data/ucnp_peaks/features.npz",
+          "bytes": 50012737,
+          "sha256": "82e25cb5ab1d91d56d3332fde4a55b77e0be5b4216c370c8f234df6729b19363"
+        }
+      ],
+      "task": "seven-band continuous peak regression",
+      "band_centers_nm": [
+        360,
+        450,
+        475,
+        520,
+        545,
+        655,
+        800
+      ],
+      "band_half_window_nm": 12.0,
+      "missing_targets": "Blank target_B1..B7 values stay missing; no zero imputation."
+    },
+    "ucnp_detection": {
+      "source_sha256": "680d5831e49c814a779497976dcd9d01be48da37ab6441ae362cb265917227e5",
+      "prompt_representations": 32266,
+      "dimension": 3584,
+      "dtype": "float32",
+      "bitwise_roundtrip": true,
+      "files": [
+        {
+          "path": "data/ucnp_detection/features_000.npz",
+          "bytes": 40821136,
+          "sha256": "18a9138d5eaad891662623e147eaa9646565c48cf3c6f120ed3ba02b41aea63b"
+        },
+        {
+          "path": "data/ucnp_detection/features_001.npz",
+          "bytes": 40791192,
+          "sha256": "83ac74080857ff184690441d1e62a6578b5e7d46c063f6ff1aa46fb872117476"
+        },
+        {
+          "path": "data/ucnp_detection/features_002.npz",
+          "bytes": 40791802,
+          "sha256": "5b72744c3146417735d07beebf4ad872e558f8b82f96b3e9957f1e0247b7a5e0"
+        },
+        {
+          "path": "data/ucnp_detection/features_003.npz",
+          "bytes": 40817835,
+          "sha256": "03a547f69176ea852c0b24b95c4ffa16e04ac58111f8c74fb55baadd532ca058"
+        },
+        {
+          "path": "data/ucnp_detection/features_004.npz",
+          "bytes": 40819377,
+          "sha256": "becfb527e0b9921b8a02073f0a2e1f603478e96f8fb4c94f3b12bd8f420b957c"
+        },
+        {
+          "path": "data/ucnp_detection/features_005.npz",
+          "bytes": 15417096,
+          "sha256": "df590a359a1aaa7bf6428c5593d00a716eff702e98f8adc335c7b6a07f388210"
+        }
+      ],
+      "task": "seven-band masked multi-label detection",
+      "band_centers_nm": [
+        360,
+        450,
+        475,
+        520,
+        545,
+        655,
+        800
+      ],
+      "band_half_window_nm": 12.0,
+      "masked_labels": "mlabel_B1..B7: -1 unknown, excluded from supervision and scoring; 0 absent, 1 present.",
+      "partition_sizes": {
+        "train": 9913,
+        "valid": 894,
+        "projection_training_pool": 9586,
+        "supplementary_supervision_only": 327
+      }
+    }
+  }
+}

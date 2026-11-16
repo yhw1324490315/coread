@@ -1,0 +1,2 @@
+# Keep source data byte-identical to the recorded SHA256 hashes.
+data/** -text

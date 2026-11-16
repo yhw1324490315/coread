@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CoRead — Consistency Readout</title>
+<meta name="description" content="Consistency readout of scientific properties from frozen language-model representations.">
+<meta name="color-scheme" content="light">
+<style>
+  :root {
+    --paper: #faf8f3;
+    --card: #ffffff;
+    --ink: #262832;
+    --muted: #5d5b63;
+    --rule: #e4ddcf;
+    --purple: #57447d;
+    --purple-soft: #ece7f4;
+    --teal: #3f8fa8;
+    --code-bg: #f3f0e8;
+    --serif: Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 var(--sans); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+  header.top { position: sticky; top: 0; z-index: 5; background: rgba(250, 248, 243, .94); backdrop-filter: blur(6px);
+               border-bottom: 1px solid var(--rule); }
+  header.top .wrap { display: flex; align-items: center; gap: 20px; height: 52px; }
+  .brand { font-family: var(--serif); font-size: 19px; color: var(--ink); text-decoration: none; letter-spacing: .01em; }
+  .brand b { color: var(--purple); font-weight: 600; }
+  nav { display: flex; gap: 18px; margin-left: auto; font-size: 14px; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:hover { color: var(--purple); }
+  .lang { border: 1px solid var(--rule); background: var(--card); color: var(--ink); border-radius: 999px; padding: 3px 12px;
+          font: 13px var(--sans); cursor: pointer; }
+  .lang:hover { border-color: var(--purple); }
+  .masthead { margin: 28px 0 8px; border-radius: 6px; overflow: hidden; border: 1px solid var(--rule); }
+  .masthead img { display: block; width: 100%; height: auto; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(26px, 4vw, 38px); line-height: 1.25; margin: 34px 0 12px; }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: 26px; margin: 0 0 14px; }
+  section { padding: 44px 0; border-top: 1px solid var(--rule); scroll-margin-top: 60px; }
+  section.intro { border-top: 0; padding-top: 0; }
+  p { margin: 0 0 14px; }
+  .lead { font-size: 18px; color: #3a3b44; max-width: 760px; }
+  .callout { background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--purple); border-radius: 6px;
+             padding: 16px 18px; margin: 22px 0; max-width: 760px; }
+  .callout strong { color: var(--purple); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 6px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 6px; text-decoration: none;
+         font-size: 15px; border: 1px solid var(--purple); }
+  .btn.primary { background: var(--purple); color: #fff; }
+  .btn.ghost { color: var(--purple); background: transparent; }
+  .btn:hover { filter: brightness(1.08); }
+  figure { margin: 18px 0 8px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .codebox { position: relative; margin: 14px 0; }
+  pre { margin: 0; background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; overflow-x: auto;
+        font: 13.5px/1.6 var(--mono); }
+  code { font-family: var(--mono); font-size: .92em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .copy { position: absolute; top: 8px; right: 8px; border: 1px solid var(--rule); background: var(--card); color: var(--muted);
+          border-radius: 4px; font: 12px var(--sans); padding: 3px 9px; cursor: pointer; }
+  .copy:hover { color: var(--purple); border-color: var(--purple); }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--rule); border-radius: 6px;
+          font-size: 15px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-weight: 600; background: #f6f3ec; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  details { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; margin: 12px 0; }
+  summary { cursor: pointer; padding: 11px 16px; font-weight: 600; }
+  summary:hover { color: var(--purple); }
+  details > div { padding: 0 16px 6px; }
+  .note { font-size: 14.5px; color: var(--muted); }
+  footer { border-top: 1px solid var(--rule); padding: 26px 0 40px; font-size: 14px; color: var(--muted); }
+  footer a, section a { color: var(--purple); }
+  [data-lang="zh"] { display: none; }
+  html[lang="zh-CN"] [data-lang="en"] { display: none; }
+  html[lang="zh-CN"] [data-lang="zh"] { display: revert; }
+  @media (max-width: 640px) {
+    nav { display: none; }
+    header.top .wrap { justify-content: space-between; }
+    .lead { font-size: 17px; }
+    section { padding: 34px 0; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><b>Co</b>Read</a>
+    <nav>
+      <a href="#how"><span data-lang="en">How it works</span><span data-lang="zh">原理</span></a>
+      <a href="#quickstart"><span data-lang="en">Quickstart</span><span data-lang="zh">快速开始</span></a>
+      <a href="#results"><span data-lang="en">Results</span><span data-lang="zh">实验结果</span></a>
+      <a href="#datasets"><span data-lang="en">Datasets</span><span data-lang="zh">数据集</span></a>
+      <a href="https://github.com/yanghongwei-cn/CoRead">GitHub</a>
+    </nav>
+    <button class="lang" id="lang" type="button" aria-label="Switch language">中文</button>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <div class="masthead"><img src="assets/masthead.svg" alt="CoRead — Consistency Readout" width="1040" height="176"></div>
+
+  <section class="intro">
+    <h1>
+      <span data-lang="en">Predict material properties from experimental descriptions</span>
+      <span data-lang="zh">从实验描述预测材料性质</span>
+    </h1>
+    <p class="lead" data-lang="en">Given a carbon-dot synthesis protocol, predict its room-temperature phosphorescence peak. CoRead extracts
+      representations from a frozen language model and fits a readout to measured labels, constraining how far
+      predictions can shift across equivalent descriptions.</p>
+    <p class="lead" data-lang="zh">输入碳点的合成条件，预测其室温磷光发射峰位。CoRead 从冻结语言模型中提取表征，用实测标签训练读出器，并约束同一实验换一种写法时的预测差异。</p>
+    <div class="callout">
+      <p data-lang="en"><strong>Less sensitivity to field order.</strong> Across four regression tasks, the mean gap between
+        predictions before and after reordering was <strong>10.8–22.3% smaller</strong> than with ordinary data augmentation.</p>
+      <p data-lang="zh"><strong>字段重排后，预测更稳定。</strong>在四个回归任务中，相比普通数据增广，重排前后的平均预测差降低了 <strong>10.8%–22.3%</strong>。</p>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/yanghongwei-cn/CoRead"><span data-lang="en">View code on GitHub</span><span data-lang="zh">在 GitHub 查看代码</span></a>
+      <a class="btn ghost" href="#quickstart"><span data-lang="en">Run the carbon-dot example</span><span data-lang="zh">运行碳点示例</span></a>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2><span data-lang="en">How the readout works</span><span data-lang="zh">读出原理</span></h2>
+    <figure>
+      <img src="assets/overview.svg" alt="Frozen model and shared readout" loading="lazy">
+      <figcaption>
+        <span data-lang="en">Original and rewritten inputs share readout parameters θ, with measured targets y providing supervision. Only an experimental description is needed for a new prediction.</span>
+        <span data-lang="zh">在原文与改写之间共享读出参数 θ，用实测目标 y 监督训练。预测新样本时，只需提供实验描述。</span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section id="quickstart">
+    <h2><span data-lang="en">Quickstart</span><span data-lang="zh">快速开始</span></h2>
+    <p data-lang="en">Start with <code>carbon_dot</code>. Run the following commands from the repository root with Python 3.10+. Skip the download if Qwen weights are already local.</p>
+    <p data-lang="zh">以 <code>carbon_dot</code> 为例。在仓库根目录使用 Python 3.10+ 运行以下命令。已有本地 Qwen 权重时可跳过下载。</p>
+    <div class="codebox"><button class="copy" type="button">Copy</button><pre><code>git clone https://github.com/yanghongwei-cn/CoRead.git
+cd CoRead
+python -m pip install ".[extract]"
+hf download Qwen/Qwen2.5-7B-Instruct --local-dir models/pretrained/Qwen2.5-7B-Instruct
+python run.py extract --data data/carbon_dot --model models/pretrained/Qwen2.5-7B-Instruct
+python run.py demo --datasets carbon_dot</code></pre></div>
+    <p data-lang="en">Find the measured and predicted values for each sample in <code>results/run_&lt;timestamp&gt;/carbon_dot/predictions.csv</code>. Extraction uses CUDA by default; the readout can then train on CPU.</p>
+    <p data-lang="zh">运行后，在 <code>results/run_&lt;timestamp&gt;/carbon_dot/predictions.csv</code> 查看每条样本的实测值和预测值。特征提取默认使用 CUDA；之后的读出训练可在 CPU 上完成。</p>
+    <details>
+      <summary><span data-lang="en">Other datasets</span><span data-lang="zh">其他数据集</span></summary>
+      <div>
+        <p data-lang="en">Extract features once for each dataset by changing <code>--data</code>, then run:</p>
+        <p data-lang="zh">修改 <code>--data</code> 路径，对每个数据集各提取一次特征，然后运行：</p>
+        <div class="codebox"><button class="copy" type="button">Copy</button><pre><code>python run.py demo --datasets carbon_dot biochar perovskite
+python run.py demo --datasets ucnp_peaks
+python run.py demo --datasets ucnp_detection</code></pre></div>
+      </div>
+    </details>
+  </section>
+
+  <section id="results">
+    <h2><span data-lang="en">Results</span><span data-lang="zh">实验结果</span></h2>
+    <p data-lang="en">How often does the same input gain both accuracy and stability? Purple marks a strictly lower absolute error and a smaller prediction gap under field reordering. Each pair compares CoRead with original training (Orig.) and ordinary data augmentation (Aug.).</p>
+    <p data-lang="zh">同一条输入能否同时更准、更稳？紫色表示在字段重排下，绝对误差严格更低且预测差更小。每一对比较 CoRead 与原文训练（Orig.）和普通数据增广（Aug.）。</p>
+    <figure><img src="assets/gains.svg" alt="Joint gains on four field-reordering benchmarks" loading="lazy"></figure>
+    <figure>
+      <img src="assets/results.svg" alt="Prediction gap versus mean absolute error" loading="lazy">
+      <figcaption>
+        <span data-lang="en">Frozen 3,584-dimensional Qwen2.5-7B-Instruct representations. Relative to ordinary augmentation, MAE changed by −3.0% to +2.2% (lower is better). pp, percentage points; UCNP, peak-wavelength regression.</span>
+        <span data-lang="zh">使用冻结的 3,584 维 Qwen2.5-7B-Instruct 表征。相比普通数据增广，MAE 变化为 −3.0% 至 +2.2%（越低越好）。pp 为百分点；UCNP 指峰位回归。</span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section id="datasets">
+    <h2><span data-lang="en">Datasets</span><span data-lang="zh">数据集</span></h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th><span data-lang="en">Dataset</span><span data-lang="zh">数据集</span></th>
+          <th class="num"><span data-lang="en">Samples</span><span data-lang="zh">样本数</span></th>
+          <th><span data-lang="en">Prediction target</span><span data-lang="zh">预测目标</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><code>carbon_dot</code></td><td class="num">418</td><td><span data-lang="en">Room-temperature phosphorescence peak (nm)</span><span data-lang="zh">室温磷光发射峰位（nm）</span></td></tr>
+          <tr><td><code>biochar</code></td><td class="num">443</td><td><span data-lang="en">Soil cadmium immobilization ratio (%)</span><span data-lang="zh">土壤镉固定率（%）</span></td></tr>
+          <tr><td><code>perovskite</code></td><td class="num">8,984</td><td><span data-lang="en">Solar-cell power conversion efficiency (%)</span><span data-lang="zh">太阳能电池光电转换效率（%）</span></td></tr>
+          <tr><td><code>ucnp_peaks</code></td><td class="num">2,639</td><td><span data-lang="en">Peak wavelengths in seven emission bands (nm)</span><span data-lang="zh">七个发射波段的峰位（nm）</span></td></tr>
+          <tr><td><code>ucnp_detection</code></td><td class="num">10,807</td><td><span data-lang="en">Presence in seven bands; 9,913 training / 894 validation</span><span data-lang="zh">七个波段是否检出；9,913 条训练、894 条验证</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:14px" data-lang="en"><strong>Sources and licences.</strong> Carbon-dot and biochar records come from the authors' earlier studies, perovskite records from The Perovskite Database Project, and UCNP records from open-access articles in Europe PMC and publisher repositories; the UCNP prompts quote the experimental descriptions of these articles. The CC BY 4.0 data licence covers the labels, splits, rewrites and paraphrases created for this work; quoted article text remains under the licence of the original article.</p>
+    <p class="note" style="margin-top:14px" data-lang="zh"><strong>来源与许可。</strong>碳点和生物炭数据来自作者此前的研究，钙钛矿数据来自 The Perovskite Database Project，UCNP 数据来自 Europe PMC 和出版商文献库中的开放获取文章；UCNP 提示引用了这些文章中的实验描述。CC BY 4.0 数据许可适用于本工作生成的标签、数据划分、改写和释义；引自原文的文本仍受原文章许可约束。</p>
+  </section>
+
+  <section id="usage">
+    <h2><span data-lang="en">Train, save and predict</span><span data-lang="zh">训练、保存与预测</span></h2>
+    <div class="codebox"><button class="copy" type="button">Copy</button><pre><code>python run.py train --data data/carbon_dot --model models/readout/carbon_dot.npz
+python run.py extract --data data/new_samples --model models/pretrained/Qwen2.5-7B-Instruct
+python run.py predict --model models/readout/carbon_dot.npz --features data/new_samples --output results/predictions.csv</code></pre></div>
+    <p data-lang="en">For new samples, create <code>data/new_samples/prompts.jsonl.gz</code>; each record needs a unique <code>sample_id</code> and either <code>text</code> or a formatted <code>rendered_prompt</code>. Training and prediction must use the same model, layer, input template and preprocessing.</p>
+    <p data-lang="zh">预测新样本时，先建立 <code>data/new_samples/prompts.jsonl.gz</code>；每条记录需要唯一的 <code>sample_id</code>，以及 <code>text</code> 或已格式化的 <code>rendered_prompt</code>。训练与预测必须使用相同的模型、层、输入模板和预处理。</p>
+    <details>
+      <summary>Python API</summary>
+      <div>
+        <div class="codebox"><button class="copy" type="button">Copy</button><pre><code>from consistency_readout import ConsistencyRidge, load_model
+
+model = ConsistencyRidge().fit(X_train, y_train, available)
+model.save("models/readout/carbon_dot.npz")
+predictions = load_model("models/readout/carbon_dot.npz").predict(X_new)</code></pre></div>
+        <p data-lang="en">UCNP adapters are <code>ConsistencyPeaks</code> and <code>ConsistencyDetection</code>; <code>load_model</code> restores the saved type, and <code>predict_proba</code> gives detection probabilities.</p>
+        <p data-lang="zh">UCNP 对应 <code>ConsistencyPeaks</code> 和 <code>ConsistencyDetection</code>；<code>load_model</code> 自动恢复保存的类型，<code>predict_proba</code> 给出检出概率。</p>
+      </div>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span data-lang="en">Software: <a href="https://github.com/yanghongwei-cn/CoRead/blob/main/LICENSE">MIT</a> · Data: <a href="https://github.com/yanghongwei-cn/CoRead/blob/main/DATA_LICENSE">CC BY 4.0</a> · Source: <a href="https://github.com/yanghongwei-cn/CoRead">github.com/yanghongwei-cn/CoRead</a></span>
+    <span data-lang="zh">软件：<a href="https://github.com/yanghongwei-cn/CoRead/blob/main/LICENSE">MIT</a> · 数据：<a href="https://github.com/yanghongwei-cn/CoRead/blob/main/DATA_LICENSE">CC BY 4.0</a> · 源码：<a href="https://github.com/yanghongwei-cn/CoRead">github.com/yanghongwei-cn/CoRead</a></span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('lang');
+    function set(lang) {
+      root.lang = lang;
+      btn.textContent = lang === 'zh-CN' ? 'English' : '中文';
+      document.title = lang === 'zh-CN' ? 'CoRead — 一致性读出' : 'CoRead — Consistency Readout';
+      try { localStorage.setItem('coread-lang', lang); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem('coread-lang'); } catch (e) {}
+    var q = new URLSearchParams(location.search).get('lang');
+    set(q === 'zh' ? 'zh-CN' : q === 'en' ? 'en' : saved || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh-CN' : 'en'));
+    btn.addEventListener('click', function () { set(root.lang === 'zh-CN' ? 'en' : 'zh-CN'); });
+    document.querySelectorAll('.copy').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var text = b.parentNode.querySelector('code').innerText;
+        var done = function () { b.textContent = '✓'; setTimeout(function () { b.textContent = 'Copy'; }, 1200); };
+        if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+      });
+    });
+  })();
+</script>
+</body>
+</html>

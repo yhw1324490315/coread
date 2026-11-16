@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+results/
+.verification/
+models/*
+!models/.gitkeep
+build/
+dist/
+*.egg-info/
+# Generated representations and local extraction checkpoints
+features*.npz
+features*.npz.partial
+features_manifest.json
+features_manifest.json.partial
+!data/features_manifest.json
